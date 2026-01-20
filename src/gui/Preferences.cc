@@ -1244,16 +1244,29 @@ void Preferences::fireEditorConfigChanged() const
   emit editorConfigChanged();
 }
 
+bool Preferences::event(QEvent *e)
+{
+  if (e->type() == QEvent::ShortcutOverride) {
+    QKeyEvent *ke = static_cast<QKeyEvent *>(e);
+    if (ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_W) {
+      e->accept();
+      return true;
+    }
+  }
+  return QMainWindow::event(e);
+}
+
 void Preferences::keyPressEvent(QKeyEvent *e)
 {
+  if ((e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_W) || (e->key() == Qt::Key_Escape)) {
+    close();
+    return;
+  }
 #ifdef Q_OS_MACOS
   if (e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_Period) {
     close();
-  } else
-#endif
-    if ((e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_W) || e->key() == Qt::Key_Escape) {
-    close();
   }
+#endif
 }
 
 void Preferences::showEvent(QShowEvent *e)
